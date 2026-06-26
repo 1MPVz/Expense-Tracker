@@ -1,7 +1,31 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  void _openAddModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF242938),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return const SizedBox(
+          height: 400,
+          // TODO: pp add modal here
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,113 +64,134 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Balance card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4F8EF7), Color(0xFF2E5FD4)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Total Balance',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    '\$4,285.50',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 36,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      _BalanceStat(
-                        icon: Icons.arrow_downward_rounded,
-                        label: 'Income',
-                        value: '\$6,500.00',
-                        iconColor: const Color(0xFF4ECCA3),
-                      ),
-                      const SizedBox(width: 32),
-                      _BalanceStat(
-                        icon: Icons.arrow_upward_rounded,
-                        label: 'Expenses',
-                        value: '\$2,214.50',
-                        iconColor: const Color(0xFFFF6B6B),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 28),
-
-            // Recent transactions
-            const Text(
-              'Recent Transactions',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            ..._dummyTransactions.map(
-              (tx) => _TransactionTile(transaction: tx),
-            ),
-          ],
-        ),
+      body: _currentIndex == 0 ? const _ExpenseListPage() : const _SummaryPage(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddModal,
+        backgroundColor: const Color(0xFF4F8EF7),
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
-
-      // Bottom nav
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF242938),
         selectedItemColor: const Color(0xFF4F8EF7),
         unselectedItemColor: Colors.white38,
-        currentIndex: 0,
-        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: 'Home',
+            icon: Icon(Icons.receipt_long_rounded),
+            label: 'Expenses',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bar_chart_rounded),
-            label: 'Stats',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline_rounded),
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.credit_card_rounded),
-            label: 'Cards',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline_rounded),
-            label: 'Profile',
+            label: 'Summary',
           ),
         ],
+      ),
+    );
+  }
+}
+
+// --- Expense List Page ---
+
+class _ExpenseListPage extends StatelessWidget {
+  const _ExpenseListPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Balance card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4F8EF7), Color(0xFF2E5FD4)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Balance',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  '\$4,285.50',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 36,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    _BalanceStat(
+                      icon: Icons.arrow_downward_rounded,
+                      label: 'Income',
+                      value: '\$6,500.00',
+                      iconColor: const Color(0xFF4ECCA3),
+                    ),
+                    const SizedBox(width: 32),
+                    _BalanceStat(
+                      icon: Icons.arrow_upward_rounded,
+                      label: 'Expenses',
+                      value: '\$2,214.50',
+                      iconColor: const Color(0xFFFF6B6B),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 28),
+
+          const Text(
+            'Recent Transactions',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          ..._dummyTransactions.map(
+            (tx) => _TransactionTile(transaction: tx),
+          ),
+
+          // Extra bottom padding so FAB doesn't cover last item
+          const SizedBox(height: 80),
+        ],
+      ),
+    );
+  }
+}
+
+// --- Summary Page (placeholder) ---
+
+class _SummaryPage extends StatelessWidget {
+  const _SummaryPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'Summary — coming soon',
+        style: TextStyle(color: Colors.white38, fontSize: 16),
       ),
     );
   }
@@ -174,7 +219,7 @@ class _BalanceStat extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: Colors.white.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: iconColor, size: 16),
@@ -186,7 +231,7 @@ class _BalanceStat extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.65),
+                color: Colors.white.withValues(alpha: 0.65),
                 fontSize: 11,
               ),
             ),
@@ -225,7 +270,7 @@ class _TransactionTile extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: transaction.color.withOpacity(0.15),
+              color: transaction.color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(transaction.icon, color: transaction.color, size: 22),
@@ -247,7 +292,7 @@ class _TransactionTile extends StatelessWidget {
                 Text(
                   transaction.category,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Colors.white.withValues(alpha: 0.4),
                     fontSize: 12,
                   ),
                 ),
@@ -273,7 +318,7 @@ class _TransactionTile extends StatelessWidget {
               Text(
                 transaction.date,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.35),
+                  color: Colors.white.withValues(alpha: 0.35),
                   fontSize: 11,
                 ),
               ),
@@ -285,7 +330,6 @@ class _TransactionTile extends StatelessWidget {
   }
 }
 
-// dummy data
 class _Transaction {
   final String title;
   final String category;
@@ -306,6 +350,8 @@ class _Transaction {
   });
 }
 
+
+// Test Data
 const _dummyTransactions = [
   _Transaction(
     title: 'Netflix',
