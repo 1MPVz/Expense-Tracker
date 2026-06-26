@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/dummy_transactions.dart';
+import '../data/transactions.dart';
 
 class ExpenseListPage extends StatelessWidget {
   const ExpenseListPage({super.key});

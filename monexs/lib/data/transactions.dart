@@ -20,6 +20,7 @@ class Transaction {
   });
 }
 
+// dummy date
 const List<Transaction> dummyTransactions = [
   Transaction(
     title: 'Netflix',
