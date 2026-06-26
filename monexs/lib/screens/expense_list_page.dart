@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../data/transactions.dart';
 
 class ExpenseListPage extends StatelessWidget {
-  const ExpenseListPage({super.key});
+  final List<Transaction> transactions;
+
+  const ExpenseListPage({super.key, required this.transactions});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +78,7 @@ class ExpenseListPage extends StatelessWidget {
           ),
           const SizedBox(height: 14),
 
-          ...dummyTransactions.map((tx) => _TransactionTile(transaction: tx)),
+          ...transactions.map((tx) => _TransactionTile(transaction: tx)),
 
           const SizedBox(height: 80),
         ],

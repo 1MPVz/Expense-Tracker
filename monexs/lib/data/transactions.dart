@@ -33,7 +33,7 @@ const List<Transaction> dummyTransactions = [
   ),
   Transaction(
     title: 'Salary',
-    category: 'Income',
+    category: 'Salary',
     amount: '3,250.00',
     date: 'Jun 25',
     isExpense: false,
@@ -60,7 +60,7 @@ const List<Transaction> dummyTransactions = [
   ),
   Transaction(
     title: 'Freelance',
-    category: 'Income',
+    category: 'Freelance',
     amount: '500.00',
     date: 'Jun 22',
     isExpense: false,
