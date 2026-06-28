@@ -18,8 +18,8 @@ class _HomePageState extends State<HomePage> {
   final List<Transaction> _transactions = List.of(initialTransactions);
 
   // form validation state
-  bool _titleError = false;
-  bool _valueError = false;
+  String? _titleErrorMessage;
+  String? _valueErrorMessage;
 
   // compute balance values from transaction list
   double get _totalIncome => _transactions
@@ -36,17 +36,63 @@ class _HomePageState extends State<HomePage> {
   bool _validateForm() {
     final title = _titleController.text.trim();
     final value = _valueController.text.trim();
-    final amount = double.tryParse(value);
 
-    final titleInvalid = title.isEmpty;
-    final valueInvalid = value.isEmpty || amount == null;
+    if (title.isEmpty) {
+      setState(() {
+        _titleErrorMessage = 'Please enter a title for this transaction.';
+        _valueErrorMessage = null;
+      });
+      return false;
+    }
+
+    if (value.isEmpty) {
+      setState(() {
+        _titleErrorMessage = null;
+        _valueErrorMessage = 'Please enter an amount.';
+      });
+      return false;
+    }
+
+    final amount = double.tryParse(value);
+    if (amount == null) {
+      setState(() {
+        _titleErrorMessage = null;
+        _valueErrorMessage = 'Enter a valid amount, such as 45.00.';
+      });
+      return false;
+    }
+
+    if (amount < 0) {
+      setState(() {
+        _titleErrorMessage = null;
+        _valueErrorMessage = 'Amount cannot be negative.';
+      });
+      return false;
+    }
+
+    if (amount > 1000000000) {
+      setState(() {
+        _titleErrorMessage = null;
+        _valueErrorMessage = 'Amount is too large.';
+      });
+      return false;
+    }
+
+    final decimalPart = value.contains('.') ? value.split('.').last : null;
+    if (decimalPart != null && decimalPart.length > 2) {
+      setState(() {
+        _titleErrorMessage = null;
+        _valueErrorMessage = 'Use up to 2 decimal places.';
+      });
+      return false;
+    }
 
     setState(() {
-      _titleError = titleInvalid;
-      _valueError = valueInvalid;
+      _titleErrorMessage = null;
+      _valueErrorMessage = null;
     });
 
-    return !titleInvalid && !valueInvalid;
+    return true;
   }
 
   // remove transaction and trigger recompute of balance getters
@@ -58,8 +104,8 @@ class _HomePageState extends State<HomePage> {
 
   void _openAddModal() {
     // reset validation errors when opening modal
-    _titleError = false;
-    _valueError = false;
+    _titleErrorMessage = null;
+    _valueErrorMessage = null;
 
     bool isExpense = true;
     String selectedType = expenseTypes.first;
@@ -182,21 +228,21 @@ class _HomePageState extends State<HomePage> {
                     controller: _titleController,
                     style: const TextStyle(color: Colors.white),
                     onChanged: (_) {
-                      if (_titleError) {
-                        setModalState(() => _titleError = false);
+                      if (_titleErrorMessage != null) {
+                        setModalState(() => _titleErrorMessage = null);
                       }
                     },
                     decoration: InputDecoration(
                       labelText: 'Title',
                       labelStyle: TextStyle(
-                        color: _titleError ? const Color(0xFFFF6B6B) : Colors.white54,
+                        color: _titleErrorMessage != null ? const Color(0xFFFF6B6B) : Colors.white54,
                       ),
                       hintText: 'e.g. Grocery shopping',
                       hintStyle: const TextStyle(color: Colors.white38),
-                      errorText: _titleError ? 'Title is required' : null,
+                      errorText: _titleErrorMessage,
                       errorStyle: const TextStyle(color: Color(0xFFFF6B6B)),
                       filled: true,
-                      fillColor: _titleError
+                      fillColor: _titleErrorMessage != null
                           ? const Color(0xFFFF6B6B).withValues(alpha: 0.08)
                           : const Color(0xFF1E2434),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -206,13 +252,13 @@ class _HomePageState extends State<HomePage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: _titleError
+                        borderSide: _titleErrorMessage != null
                             ? const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)
                             : BorderSide.none,
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: _titleError
+                        borderSide: _titleErrorMessage != null
                             ? const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)
                             : const BorderSide(color: Color(0xFF4F8EF7), width: 1.5),
                       ),
@@ -320,21 +366,21 @@ class _HomePageState extends State<HomePage> {
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     style: const TextStyle(color: Colors.white),
                     onChanged: (_) {
-                      if (_valueError) {
-                        setModalState(() => _valueError = false);
+                      if (_valueErrorMessage != null) {
+                        setModalState(() => _valueErrorMessage = null);
                       }
                     },
                     decoration: InputDecoration(
                       labelText: 'Value',
                       labelStyle: TextStyle(
-                        color: _valueError ? const Color(0xFFFF6B6B) : Colors.white54,
+                        color: _valueErrorMessage != null ? const Color(0xFFFF6B6B) : Colors.white54,
                       ),
                       hintText: 'e.g. 45.00',
                       hintStyle: const TextStyle(color: Colors.white38),
-                      errorText: _valueError ? 'Enter a valid amount' : null,
+                      errorText: _valueErrorMessage,
                       errorStyle: const TextStyle(color: Color(0xFFFF6B6B)),
                       filled: true,
-                      fillColor: _valueError
+                      fillColor: _valueErrorMessage != null
                           ? const Color(0xFFFF6B6B).withValues(alpha: 0.08)
                           : const Color(0xFF1E2434),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -344,13 +390,13 @@ class _HomePageState extends State<HomePage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: _valueError
+                        borderSide: _valueErrorMessage != null
                             ? const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)
                             : BorderSide.none,
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: _valueError
+                        borderSide: _valueErrorMessage != null
                             ? const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)
                             : const BorderSide(color: Color(0xFF4F8EF7), width: 1.5),
                       ),
