@@ -13,61 +13,6 @@ class ExpenseListPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Balance card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF4F8EF7), Color(0xFF2E5FD4)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Total Balance',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.75),
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  '\$4,285.50',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 36,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    _BalanceStat(
-                      icon: Icons.arrow_downward_rounded,
-                      label: 'Income',
-                      value: '\$6,500.00',
-                      iconColor: const Color(0xFF4ECCA3),
-                    ),
-                    const SizedBox(width: 32),
-                    _BalanceStat(
-                      icon: Icons.arrow_upward_rounded,
-                      label: 'Expenses',
-                      value: '\$2,214.50',
-                      iconColor: const Color(0xFFFF6B6B),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 28),
-
           const Text(
             'Recent Transactions',
             style: TextStyle(
@@ -83,57 +28,6 @@ class ExpenseListPage extends StatelessWidget {
           const SizedBox(height: 80),
         ],
       ),
-    );
-  }
-}
-
-class _BalanceStat extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color iconColor;
-
-  const _BalanceStat({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.iconColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: iconColor, size: 16),
-        ),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.65),
-                fontSize: 11,
-              ),
-            ),
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

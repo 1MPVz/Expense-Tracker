@@ -17,6 +17,16 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _valueController = TextEditingController();
   final List<Transaction> _transactions = List.of(dummyTransactions);
 
+  // compute balance values from transaction list
+  double get _totalIncome => _transactions
+      .where((tx) => !tx.isExpense)
+      .fold(0, (sum, tx) => sum + double.parse(tx.amount.replaceAll(',', '')));
+
+  double get _totalExpense => _transactions
+      .where((tx) => tx.isExpense)
+      .fold(0, (sum, tx) => sum + double.parse(tx.amount.replaceAll(',', '')));
+
+  double get _totalBalance => _totalIncome - _totalExpense;
 
   void _openAddModal() {
     bool isExpense = true;
@@ -314,10 +324,11 @@ class _HomePageState extends State<HomePage> {
                               amount: amount.toStringAsFixed(2),
                               date: formatDate(selectedDate),
                               isExpense: isExpense,
-                              icon: isExpense ? Icons.shopping_cart_rounded : Icons.attach_money_rounded,
+                              icon: isExpense ? expenseTypeIcon(selectedType) : incomeTypeIcon(selectedType),
                               color: isExpense ? const Color(0xFFFF6B6B) : const Color(0xFF4ECCA3),
                             );
 
+                            // setState triggers recompute of states
                             setState(() {
                               _transactions.insert(0, newTransaction);
                             });
@@ -385,8 +396,75 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      // handle page navigation between expense lit and summary page
-      body: _currentIndex == 0 ? ExpenseListPage(transactions: _transactions) : SummaryPage(transactions: _transactions),
+      body: Column(
+        children: [
+          // balance card always stays fixed above the scrollable content
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4F8EF7), Color(0xFF2E5FD4)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Total Balance',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.75),
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // total balance auto-updates when transactions change
+                  Text(
+                    '\$${_totalBalance.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 36,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      _BalanceStat(
+                        icon: Icons.arrow_downward_rounded,
+                        label: 'Income',
+                        // income auto-updates when transactions change
+                        value: '\$${_totalIncome.toStringAsFixed(2)}',
+                        iconColor: const Color(0xFF4ECCA3),
+                      ),
+                      const SizedBox(width: 32),
+                      _BalanceStat(
+                        icon: Icons.arrow_upward_rounded,
+                        label: 'Expenses',
+                        // expense auto-updates when transactions change
+                        value: '\$${_totalExpense.toStringAsFixed(2)}',
+                        iconColor: const Color(0xFFFF6B6B),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // handle page navigation between expense list and summary page
+          Expanded(
+            child: _currentIndex == 0
+                ? ExpenseListPage(transactions: _transactions)
+                : SummaryPage(transactions: _transactions),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddModal,
         backgroundColor: const Color(0xFF4F8EF7),
@@ -410,6 +488,58 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+// Balance Stat widget used in the fixed balance card
+class _BalanceStat extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color iconColor;
+
+  const _BalanceStat({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: iconColor, size: 16),
+        ),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.65),
+                fontSize: 11,
+              ),
+            ),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
