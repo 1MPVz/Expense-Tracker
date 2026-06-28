@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/transactions.dart';
+import 'transaction_detail_page.dart';
 
 class ExpenseListPage extends StatelessWidget {
   final List<Transaction> transactions;
@@ -36,7 +37,38 @@ class ExpenseListPage extends StatelessWidget {
               background: _DeleteBackground(alignment: Alignment.centerLeft),
               secondaryBackground: _DeleteBackground(alignment: Alignment.centerRight),
               onDismissed: (_) => onDelete(tx),
-              child: _TransactionTile(transaction: tx),
+
+              // tap to navigate to detail page
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) =>
+                          TransactionDetailPage(transaction: tx),
+                      transitionsBuilder: (_, animation, __, child) {
+                        final slide = Tween<Offset>(
+                          begin: const Offset(1.0, 0.0),
+                          end: Offset.zero,
+                        ).animate(CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeOutCubic,
+                        ));
+                        final fade = CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeIn,
+                        );
+                        return SlideTransition(
+                          position: slide,
+                          child: FadeTransition(opacity: fade, child: child),
+                        );
+                      },
+                      transitionDuration: const Duration(milliseconds: 350),
+                    ),
+                  );
+                },
+                child: _TransactionTile(transaction: tx),
+              ),
             ),
           ),
 
@@ -47,7 +79,7 @@ class ExpenseListPage extends StatelessWidget {
   }
 }
 
-// Red background shown behind tile when swiping
+// --- Red background shown behind tile when swiping ---
 class _DeleteBackground extends StatelessWidget {
   final Alignment alignment;
 
@@ -89,7 +121,6 @@ class _DeleteBackground extends StatelessWidget {
   }
 }
 
-// build each transaction tile object
 class _TransactionTile extends StatelessWidget {
   final Transaction transaction;
 
