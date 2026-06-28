@@ -79,7 +79,7 @@ class ExpenseListPage extends StatelessWidget {
   }
 }
 
-// --- Red background shown behind tile when swiping ---
+// Red background shown behind tile when swiping
 class _DeleteBackground extends StatelessWidget {
   final Alignment alignment;
 
