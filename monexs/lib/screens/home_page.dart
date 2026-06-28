@@ -17,6 +17,10 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _valueController = TextEditingController();
   final List<Transaction> _transactions = List.of(dummyTransactions);
 
+  // form validation state
+  bool _titleError = false;
+  bool _valueError = false;
+
   // compute balance values from transaction list
   double get _totalIncome => _transactions
       .where((tx) => !tx.isExpense)
@@ -28,7 +32,28 @@ class _HomePageState extends State<HomePage> {
 
   double get _totalBalance => _totalIncome - _totalExpense;
 
+  // validate form fields and return true if all valid
+  bool _validateForm() {
+    final title = _titleController.text.trim();
+    final value = _valueController.text.trim();
+    final amount = double.tryParse(value);
+
+    final titleInvalid = title.isEmpty;
+    final valueInvalid = value.isEmpty || amount == null;
+
+    setState(() {
+      _titleError = titleInvalid;
+      _valueError = valueInvalid;
+    });
+
+    return !titleInvalid && !valueInvalid;
+  }
+
   void _openAddModal() {
+    // reset validation errors when opening modal
+    _titleError = false;
+    _valueError = false;
+
     bool isExpense = true;
     String selectedType = expenseTypes.first;
     DateTime selectedDate = DateTime.now();
@@ -145,20 +170,44 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 24),
 
+                  // title field — turns red border when empty
                   TextField(
                     controller: _titleController,
                     style: const TextStyle(color: Colors.white),
+                    onChanged: (_) {
+                      if (_titleError) {
+                        setModalState(() => _titleError = false);
+                      }
+                    },
                     decoration: InputDecoration(
                       labelText: 'Title',
-                      labelStyle: const TextStyle(color: Colors.white54),
+                      labelStyle: TextStyle(
+                        color: _titleError ? const Color(0xFFFF6B6B) : Colors.white54,
+                      ),
                       hintText: 'e.g. Grocery shopping',
                       hintStyle: const TextStyle(color: Colors.white38),
+                      errorText: _titleError ? 'Title is required' : null,
+                      errorStyle: const TextStyle(color: Color(0xFFFF6B6B)),
                       filled: true,
-                      fillColor: const Color(0xFF1E2434),
+                      fillColor: _titleError
+                          ? const Color(0xFFFF6B6B).withValues(alpha: 0.08)
+                          : const Color(0xFF1E2434),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: _titleError
+                            ? const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)
+                            : BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: _titleError
+                            ? const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)
+                            : const BorderSide(color: Color(0xFF4F8EF7), width: 1.5),
                       ),
                     ),
                   ),
@@ -258,21 +307,45 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 14),
 
+                  // value field — turns red border when empty or not a number
                   TextField(
                     controller: _valueController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     style: const TextStyle(color: Colors.white),
+                    onChanged: (_) {
+                      if (_valueError) {
+                        setModalState(() => _valueError = false);
+                      }
+                    },
                     decoration: InputDecoration(
                       labelText: 'Value',
-                      labelStyle: const TextStyle(color: Colors.white54),
+                      labelStyle: TextStyle(
+                        color: _valueError ? const Color(0xFFFF6B6B) : Colors.white54,
+                      ),
                       hintText: 'e.g. 45.00',
                       hintStyle: const TextStyle(color: Colors.white38),
+                      errorText: _valueError ? 'Enter a valid amount' : null,
+                      errorStyle: const TextStyle(color: Color(0xFFFF6B6B)),
                       filled: true,
-                      fillColor: const Color(0xFF1E2434),
+                      fillColor: _valueError
+                          ? const Color(0xFFFF6B6B).withValues(alpha: 0.08)
+                          : const Color(0xFF1E2434),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: _valueError
+                            ? const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)
+                            : BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: _valueError
+                            ? const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)
+                            : const BorderSide(color: Color(0xFF4F8EF7), width: 1.5),
                       ),
                     ),
                   ),
@@ -309,13 +382,14 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           onPressed: () {
-                            final title = _titleController.text.trim();
-                            final valueText = _valueController.text.trim();
-                            final amount = double.tryParse(valueText);
+                            // run validation before submitting
+                            final isValid = _validateForm();
+                            setModalState(() {}); // re-render modal with error state
 
-                            if (title.isEmpty || amount == null) {
-                              return;
-                            }
+                            if (!isValid) return;
+
+                            final title = _titleController.text.trim();
+                            final amount = double.parse(_valueController.text.trim());
 
                             // create new transaction object and set it as a state
                             final newTransaction = Transaction(
@@ -328,7 +402,7 @@ class _HomePageState extends State<HomePage> {
                               color: isExpense ? const Color(0xFFFF6B6B) : const Color(0xFF4ECCA3),
                             );
 
-                            // setState triggers recompute of states
+                            // setState triggers recompute of _totalIncome, _totalExpense, _totalBalance getters
                             setState(() {
                               _transactions.insert(0, newTransaction);
                             });
