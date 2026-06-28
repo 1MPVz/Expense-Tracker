@@ -89,6 +89,7 @@ class _DeleteBackground extends StatelessWidget {
   }
 }
 
+// build each transaction tile object
 class _TransactionTile extends StatelessWidget {
   final Transaction transaction;
 

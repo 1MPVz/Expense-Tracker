@@ -42,6 +42,6 @@ class Transaction {
 //  ),
 //];
 
-const List<Transaction> dummyTransactions = [
+const List<Transaction> initialTransactions = [
 
 ];

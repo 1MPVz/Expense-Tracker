@@ -15,7 +15,7 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _valueController = TextEditingController();
-  final List<Transaction> _transactions = List.of(dummyTransactions);
+  final List<Transaction> _transactions = List.of(initialTransactions);
 
   // form validation state
   bool _titleError = false;
