@@ -3,8 +3,13 @@ import '../data/transactions.dart';
 
 class ExpenseListPage extends StatelessWidget {
   final List<Transaction> transactions;
+  final void Function(Transaction) onDelete;
 
-  const ExpenseListPage({super.key, required this.transactions});
+  const ExpenseListPage({
+    super.key,
+    required this.transactions,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +28,61 @@ class ExpenseListPage extends StatelessWidget {
           ),
           const SizedBox(height: 14),
 
-          ...transactions.map((tx) => _TransactionTile(transaction: tx)),
+          ...transactions.map(
+            (tx) => Dismissible(
+              // unique key per transaction required by Dismissible
+              key: ValueKey(tx),
+              direction: DismissDirection.horizontal,
+              background: _DeleteBackground(alignment: Alignment.centerLeft),
+              secondaryBackground: _DeleteBackground(alignment: Alignment.centerRight),
+              onDismissed: (_) => onDelete(tx),
+              child: _TransactionTile(transaction: tx),
+            ),
+          ),
 
           const SizedBox(height: 80),
+        ],
+      ),
+    );
+  }
+}
+
+// Red background shown behind tile when swiping
+class _DeleteBackground extends StatelessWidget {
+  final Alignment alignment;
+
+  const _DeleteBackground({required this.alignment});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF3B3B),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFF3B3B).withValues(alpha: 0.4),
+            blurRadius: 12,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.delete_rounded, color: Colors.white, size: 22),
+          SizedBox(width: 8),
+          Text(
+            'Delete',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );

@@ -49,6 +49,13 @@ class _HomePageState extends State<HomePage> {
     return !titleInvalid && !valueInvalid;
   }
 
+  // remove transaction and trigger recompute of balance getters
+  void _deleteTransaction(Transaction tx) {
+    setState(() {
+      _transactions.remove(tx);
+    });
+  }
+
   void _openAddModal() {
     // reset validation errors when opening modal
     _titleError = false;
@@ -534,7 +541,7 @@ class _HomePageState extends State<HomePage> {
           // handle page navigation between expense list and summary page
           Expanded(
             child: _currentIndex == 0
-                ? ExpenseListPage(transactions: _transactions)
+                ? ExpenseListPage(transactions: _transactions, onDelete: _deleteTransaction)
                 : SummaryPage(transactions: _transactions),
           ),
         ],
