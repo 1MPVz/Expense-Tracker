@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/transactions.dart';
 import 'expense_list_page.dart';
 import 'summary_page.dart';
+import '../data/transaction_type.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,26 +17,10 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _valueController = TextEditingController();
   final List<Transaction> _transactions = List.of(dummyTransactions);
 
-  static const List<String> _expenseTypes = [
-    'Food & Drink',
-    'Transport',
-    'Entertainment',
-    'Utilities',
-    'Shopping',
-    'Other',
-  ];
-
-  static const List<String> _incomeTypes = [
-    'Salary',
-    'Freelance',
-    'Bonus',
-    'Investment',
-    'Other',
-  ];
 
   void _openAddModal() {
     bool isExpense = true;
-    String selectedType = _expenseTypes.first;
+    String selectedType = expenseTypes.first;
     DateTime selectedDate = DateTime.now();
 
     String formatDate(DateTime date) {
@@ -69,7 +54,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final types = isExpense ? _expenseTypes : _incomeTypes;
+            final types = isExpense ? expenseTypes : incomeTypes;
             return Container(
               padding: EdgeInsets.only(
                 top: 20,
@@ -98,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               setModalState(() {
                                 isExpense = true;
-                                selectedType = _expenseTypes.first;
+                                selectedType = expenseTypes.first;
                               });
                             },
                             child: Container(
@@ -124,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               setModalState(() {
                                 isExpense = false;
-                                selectedType = _incomeTypes.first;
+                                selectedType = incomeTypes.first;
                               });
                             },
                             child: Container(
@@ -211,6 +196,7 @@ class _HomePageState extends State<HomePage> {
 
                   GestureDetector(
                     onTap: () async {
+                      // use built in show Date Picker function for calendar
                       final picked = await showDatePicker(
                         context: context,
                         initialDate: selectedDate,
@@ -321,6 +307,7 @@ class _HomePageState extends State<HomePage> {
                               return;
                             }
 
+                            // create new transaction object and set it as a state
                             final newTransaction = Transaction(
                               title: title,
                               category: selectedType,
@@ -335,6 +322,7 @@ class _HomePageState extends State<HomePage> {
                               _transactions.insert(0, newTransaction);
                             });
 
+                            // clear controller when press enter
                             _titleController.clear();
                             _valueController.clear();
                             Navigator.pop(context);
@@ -367,6 +355,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1F2E),
+      // this is the header of the app
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1F2E),
         elevation: 0,
@@ -379,10 +368,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-            onPressed: () {},
-          ),
           const Padding(
             padding: EdgeInsets.only(right: 12),
             child: CircleAvatar(
@@ -400,9 +385,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _currentIndex == 0
-          ? ExpenseListPage(transactions: _transactions)
-          : SummaryPage(transactions: _transactions),
+      // handle page navigation between expense lit and summary page
+      body: _currentIndex == 0 ? ExpenseListPage(transactions: _transactions) : SummaryPage(transactions: _transactions),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddModal,
         backgroundColor: const Color(0xFF4F8EF7),
