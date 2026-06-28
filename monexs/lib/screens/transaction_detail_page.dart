@@ -65,8 +65,8 @@ class TransactionDetailPage extends StatelessWidget {
             // amount
             Text(
               isExpense
-                  ? '-\$${transaction.amount}'
-                  : '+\$${transaction.amount}',
+                  ? '-\฿${transaction.amount}'
+                  : '+\฿${transaction.amount}',
               style: TextStyle(
                 color: color,
                 fontSize: 32,

@@ -552,7 +552,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 8),
                   // total balance auto-updates when transactions change
                   Text(
-                    '\$${_totalBalance.toStringAsFixed(2)}',
+                    '\฿${_totalBalance.toStringAsFixed(2)}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 36,
@@ -566,7 +566,7 @@ class _HomePageState extends State<HomePage> {
                         icon: Icons.arrow_downward_rounded,
                         label: 'Income',
                         // income auto-updates when transactions change
-                        value: '\$${_totalIncome.toStringAsFixed(2)}',
+                        value: '\฿${_totalIncome.toStringAsFixed(2)}',
                         iconColor: const Color(0xFF4ECCA3),
                       ),
                       const SizedBox(width: 32),
@@ -574,7 +574,7 @@ class _HomePageState extends State<HomePage> {
                         icon: Icons.arrow_upward_rounded,
                         label: 'Expenses',
                         // expense auto-updates when transactions change
-                        value: '\$${_totalExpense.toStringAsFixed(2)}',
+                        value: '\฿${_totalExpense.toStringAsFixed(2)}',
                         iconColor: const Color(0xFFFF6B6B),
                       ),
                     ],

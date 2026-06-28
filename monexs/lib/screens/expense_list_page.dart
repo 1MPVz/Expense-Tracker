@@ -175,8 +175,8 @@ class _TransactionTile extends StatelessWidget {
             children: [
               Text(
                 transaction.isExpense
-                    ? '-\$${transaction.amount}'
-                    : '+\$${transaction.amount}',
+                    ? '-\฿${transaction.amount}'
+                    : '+\฿${transaction.amount}',
                 style: TextStyle(
                   color: transaction.isExpense
                       ? const Color(0xFFFF6B6B)
